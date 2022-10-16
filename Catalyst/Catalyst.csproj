@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <Nullable>enable</Nullable>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <GenerateDocumentationFile>False</GenerateDocumentationFile>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)'=='Release'">
+        <DebugType>none</DebugType>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(OS)'=='Windows_NT'">
+        <DefineConstants>Windows</DefineConstants>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))'">
+        <DefineConstants>OSX</DefineConstants>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))'">
+        <DefineConstants>Linux</DefineConstants>
+    </PropertyGroup>
+    
+    <ItemGroup>
+        <Content Include="Libraries\Win-x64\SDL2.dll" Condition="'$(OS)'=='Windows_NT'">
+            <Link>%(Filename)%(Extension)</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <None Remove="Resources\Shaders\frag.spv" />
+        <Content Include="Resources\Shaders\frag.spv">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <None Remove="Resources\Shaders\vert.spv" />
+        <Content Include="Resources\Shaders\vert.spv">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
+    
+    <ItemGroup>
+        <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.0.0" />
+    </ItemGroup>
+</Project>
