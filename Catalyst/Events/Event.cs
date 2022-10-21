@@ -4,4 +4,9 @@
     {
         
     }
+
+    public enum EventType
+    {
+        
+    }
 }

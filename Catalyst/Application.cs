@@ -1,5 +1,6 @@
 using System.Linq;
 using Catalyst.Events;
+using Catalyst.Rendering.Vulkan.Khr;
 using Catalyst.Windowing.SDL2;
 using VK = Catalyst.Rendering.Vulkan;
 using Renderer = Catalyst.Rendering.Renderer;
@@ -12,15 +13,10 @@ namespace Catalyst
         public Window Window;
         public Renderer Renderer;
 
-        public VK.Instance VKInstance;
-        private VK.AllocationCallbacks? VKAllocator;
-        
         public ApplicationState State;
         public EventQueue EventQueue;
 
         public string Name;
-
-        private VK.ApplicationInfo _appInfo;
 
         public Application(string name)
         {
@@ -31,12 +27,9 @@ namespace Catalyst
             EventQueue = new EventQueue();
             Window = new Window(this);
 
-            VKInstance = CreateVulkanInstance();
-            VKAllocator = VKInstance.Allocator;
+            //VKInstance = CreateVulkanInstance();
             
-            
-            SDL.Vulkan_CreateSurface(Window.window, VKInstance, out var a);
-            Renderer = new Renderer(this, new VK.Khr.SurfaceKhr(VKInstance, ref VKAllocator, (long)a));
+            //Renderer = new Renderer(this, Window);
         }
 
         public virtual void Load()
@@ -46,6 +39,8 @@ namespace Catalyst
         
         public virtual void Start()
         {
+            Window.Show();
+            
             State = ApplicationState.Running;
             while (State != ApplicationState.Closing)
             {
@@ -58,32 +53,8 @@ namespace Catalyst
             //EventQueue
 
             Window.Update();
+            //Renderer.Draw();
         }
-
-        private VK.Instance CreateVulkanInstance()
-        {
-            _appInfo = new VK.ApplicationInfo(Name,
-                default(Rendering.Vulkan.Version),
-                Engine.Name,
-                new Rendering.Vulkan.Version(Engine.Version.Major, Engine.Version.Minor, Engine.Version.Patch));
-
-            string[]? layerNames = new string[] { };
-            string[]? extensionNames = Window.GetInstanceExtensions();
-
-            if (Debug.IsDebug)
-            {
-                layerNames = new[] {"VK_LAYER_KHRONOS_validation"};
-                extensionNames = extensionNames.Concat(new[] {"VK_EXT_debug_utils", "VK_EXT_debug_report"}).ToArray();
-            }
-
-            VKInstance = new VK.Instance(new VK.InstanceCreateInfo(_appInfo, layerNames == new string[]{} ? null : layerNames, extensionNames));
-            Debug.CreateVulkanDebugCallback(VKInstance);
-            
-            return VKInstance;
-        }
-        //Window
-        //Vulkan
-        //Input
     }
 
     public enum ApplicationState
